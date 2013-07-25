@@ -33,3 +33,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Cloud 9
+.c9*
