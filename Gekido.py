@@ -20,8 +20,8 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 decimal.getcontext().prec = 1000
 
 # Set my deltas to be really accurate
-k = decimal.Decimal("0.00000000000000000000000001")
-delta = decimal.Decimal("0.0000000000000000000000001")
+k = decimal.Decimal("0.000000000000000000000000000001")
+delta = decimal.Decimal("0.00000000000000000000000000001")
 
 # What are we making a start as
 a = decimal.Decimal("5.0")
