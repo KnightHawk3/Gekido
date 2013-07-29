@@ -16,17 +16,25 @@ if time: then = time.time()
 # Make it known we want US style locale
 locale.setlocale(locale.LC_ALL, 'en_US')
 
-# Set it to be really accurate.
-decimal.getcontext().prec = 1000
+context = decimal.Context(rounding=decimal.ROUND_05UP,)
+
+# Set it to be really accurate. If you want to run this in a shortis ammount of
+# Time, set this to be smaller.
+# Basically this means 1k decimal places.
+decimal.getcontext().prec = 10000
 
 # Set my deltas to be really accurate
-k = decimal.Decimal("0.000000000000000000000000000001")
-delta = decimal.Decimal("0.00000000000000000000000000001")
+
+# Hey, want to know what 999 zeros looks like.
+k = decimal.Decimal("0.0000000000000000000000000000000000000000000000000000001")
+
+delta = decimal.Decimal("0.000000000000000000000000000000000000000000000000001")
+
 
 # What are we making a start as
 a = decimal.Decimal("5.0")
 # Calculating the gradient with thisvv
-m = abs(((a**k)-1)/k)
+m = ((a**k)-1)/(k)
 
 # b is the value I am subtracting or adding for my binary search algorithm
 b = decimal.Decimal("2.5")
@@ -39,9 +47,18 @@ with open('results.csv', 'wb') as csvfile:
                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
     writer.writerow(["Equation", "Result", "Gradient"])
 
+i = 0
+
 while m != 1 + delta:
-    if time: then = time.time()
+    if time == True: then = time.time()
     
+    # Use i to keep track of whether to print the full number of the scientific 
+    # notation.
+    if i != 5:
+        i += 1
+    else:
+        i = 0
+        
     a2 = a
     b2 = b
     # if the a value is too big, make it a bit smaller
@@ -56,15 +73,20 @@ while m != 1 + delta:
     b = b / 2
 
     # Recalculate the gradient
-    m = abs(((a**k-1)/k))
+    m = ((a**k)-1)/(k)
     # Print the working total
-    print "Number: %s" % a
-    if time: print "Time:   %s" % (time.time() - then)
+    print "Number: %s" % context.to_eng_string(a)
+    if time == True: print "Time:   %s" % (time.time() - then)
     
     with open('results.csv', 'ab') as csvfile:
         writer = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(["%s - %s" % (a2, b2), "%s" % (a), "%s" % (m)])
+        # If its the fith time, write it in full.
+        if i == 5:
+            writer.writerow(["$%s - %s$" % (a2, b2), "$%s$" % (a), "$%s$" % (m)])
+        # Otherwise, write it in scientific notation.
+        else:
+            writer.writerow(["$%e - %e$" % (a2, b2), "$%e$" % (a), "$%e$" % (m)])
 
 # Print it one last time when we are done!
 print 10*"-"
